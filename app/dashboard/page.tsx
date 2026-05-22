@@ -1,29 +1,19 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
-
-import data from "./data.json"
+// app/dashboard/page.tsx
 import { Metadata } from "next";
 import { generateMeta } from "@/lib/utils";
+import ReturnsPortalPage from "./returns/page";
 
-export async function generateMetadata(): Promise<Metadata>{
+export async function generateMetadata(): Promise<Metadata> {
   return generateMeta({
-    title: "Dashboard Template",
-    description:
-      "A list of users created using the Tanstack Table. Tailwind is built on CSS and React.",
+    title: "Returns & Claims | iBlaze",
+    description: "Secure customer returns and order claims tracking portal.",
   });
 }
 
 export default function Page() {
   return (
     <>
-
-      <div className="flex items-center justify-between ">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome Toby</h1>
-      </div>
-      <SectionCards />
-        <ChartAreaInteractive />
-      <DataTable data={data} />
+      <ReturnsPortalPage />
     </>
-  )
+  );
 }
