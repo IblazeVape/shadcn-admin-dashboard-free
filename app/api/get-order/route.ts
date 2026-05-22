@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Session verification mismatch token rules." }, { status: 403 });
     }
 
-    // 2. Locate target request parameters
+    // 2. Locate target request parameter identifiers
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get("orderId");
     if (!orderId) {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     const graphqlOrderId = `gid://shopify/Order/${orderId}`;
     
-    // Exact structural GraphQL field tracking mapping configuration parameters
+    // Explicit structural GraphQL fields query layout mapping criteria
     const query = `
       query GetOrderDetails($id: ID!) {
         node(id: $id) {
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     const eligibleItems: any[] = [];
     const ineligibleItems: any[] = [];
 
-    // 3. Process dispatch logic boundaries using client formatting rules
+    // 3. Process item conditions maps using specific UK dispatch labels
     order.lineItems.edges.forEach((edge: any) => {
       const item = edge.node;
       const payload = {
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
         title: item.title,
         variantTitle: item.variantTitle,
         image: item.image?.url || "",
-        price: (totalPrice / item.quantity).toString(), // Calculate individual price bounds
+        price: (totalPrice / item.quantity).toString(), 
         quantityAvailable: item.quantity,
         handle: item.product?.handle || "",
       };
