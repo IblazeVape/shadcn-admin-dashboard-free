@@ -6,7 +6,7 @@ import { getClaimConfirmationTemplate } from "../_lib/templates";
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Enforce session structural authorization validation metrics
+    // 1. Validate session structural authorization token parameters
     const session = parseSessionCookie(req);
     if (!session) {
       return NextResponse.json({ error: "Profile trace verification expired." }, { status: 401 });
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required claim payload criteria fields." }, { status: 400 });
     }
 
-    // 2. Build items list visualization template structure mapping parameters
+    // 2. Build item visualization block configurations
     let itemsHtml = "<ul style='margin: 0; padding-left: 20px; font-size: 14px; color: #27272a;'>";
     items.forEach((item: any) => {
       const descriptionText = item.description ? ` - Description: <em>"${item.description}"</em>` : "";
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     });
     itemsHtml += "</ul>";
 
-    // 3. Dispatch verification alerts utilizing your custom transactional email template configurations
+    // 3. Send out the claim validation receipt alert
     const emailContent = getClaimConfirmationTemplate(session.sessionEmail, orderId, itemsHtml);
     await sendEmail({
       toEmail: session.sessionEmail,
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error("Claim submission pipeline error execution failure:", err);
+    console.error("Claim submission pipeline execution failure error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
