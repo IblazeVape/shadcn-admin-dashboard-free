@@ -1,19 +1,16 @@
-// app/dashboard/page.tsx
-import { Metadata } from "next";
-import { generateMeta } from "@/lib/utils";
-import ReturnsPortalPage from "./returns/page";
+// app/page.tsx
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import ReturnsPortalPage from "./dashboard/returns/page";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return generateMeta({
-    title: "Returns & Claims | iBlaze",
-    description: "Secure customer returns and order claims tracking portal.",
-  });
-}
+export default async function Home() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("portal_session")?.value;
 
-export default function Page() {
-  return (
-    <>
-      <ReturnsPortalPage />
-    </>
-  );
+  // Enforce server-side bounce if the cookie drops or isn't matching
+  if (!session) {
+    redirect("/api/login");
+  }
+
+  return <ReturnsPortalPage />;
 }
