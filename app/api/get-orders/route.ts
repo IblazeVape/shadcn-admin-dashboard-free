@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   try {
-    // 1. Session verification check parameters extraction
+    // 1. Extract and split active session track metrics
     const sessionCookie = req.cookies.get("portal_session")?.value;
     if (!sessionCookie) {
       return NextResponse.json({ error: "Session missing. Please log in." }, { status: 401 });
@@ -17,26 +17,26 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Configuration mismatch on server environment variables." }, { status: 500 });
     }
 
-    // 2. Validate current session expiration window
+    // 2. Validate current token session expiration window
     const currentTimestamp = Math.floor(Date.now() / 1000);
     if (currentTimestamp > parseInt(expiryTime, 10)) {
       return NextResponse.json({ error: "Session expired. Please log in again." }, { status: 401 });
     }
 
-    // 3. Authenticate user integrity matching verification checksum parameters
+    // 3. Authenticate user matching signature verification checksum rules
     const expectedSig = crypto
       .createHmac("sha256", portalSecret)
       .update(`${sessionEmail}|${accessToken}|${expiryTime}`)
       .digest("hex");
 
     if (sessionSig !== expectedSig) {
-      return NextResponse.json({ error: "Unauthorised session signature profile trace window parameters." }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorised session signature context profile trace parameters." }, { status: 403 });
     }
 
-    const shop = process.env.SHOPIFY_STORE_URL;
+    const shop = process.env.SHOPIFY_STORE_URL || "6jjpzt-jz.myshopify.com";
     const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;
 
-    // Your precise original GraphQL Query criteria parameter layout
+    // Strict GraphQL operational query format parameters
     const query = `
       query GetOrders($query: String!) {
         shop { id }
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       }
     `;
 
-    const response = await fetch(`https://${shop}/admin/api/2024-04/graphql.json`, {
+    const response = await fetch(`https://${shop}/admin/api/2026-04/graphql.json`, {
       method: "POST",
       headers: { 
         "X-Shopify-Access-Token": shopifyAccessToken!, 
@@ -74,8 +74,8 @@ export async function GET(req: NextRequest) {
 
     const shopId = result.data.shop.id.split("/").pop();
     
-    // 4. Validate Shopify Customer Account Session Token Status active
-    const verifyRes = await fetch(`https://shopify.com/${shopId}/account/customer/api/2024-04/graphql`, {
+    // 4. Validate dynamic Customer Account API Token Handshake configuration
+    const verifyRes = await fetch(`https://shopify.com/${shopId}/account/customer/api/2026-04/graphql`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": accessToken },
       body: JSON.stringify({ query: `query { customer { id } }` })
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
     const firstName = customers[0].node.firstName || "";
     const rawOrders = customers[0].node.orders.edges.map((e: any) => e.node);
     
-    // 5. Structure custom tracking conditions matching UK tracking specifications
+    // 5. Build processing loops for UK item delivery status conditions
     const processedOrders = rawOrders.map((order: any) => {
       const status = order.displayFulfillmentStatus;
       const isFulfilled = status === "FULFILLED" || status === "PARTIALLY_FULFILLED";
