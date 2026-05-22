@@ -7,15 +7,12 @@ export async function GET(req: NextRequest) {
     const code = req.nextUrl.searchParams.get("code");
     if (!code) return new NextResponse("Authorisation code missing.", { status: 400 });
 
-    // Ensure this matches your primary store domain where customer accounts live
     const shop = "iblazevape.co.uk"; 
     const clientId = process.env.CUSTOMER_API_CLIENT_ID;
     const clientSecret = process.env.CUSTOMER_API_CLIENT_SECRET;
-    
-    // This MUST match the exact Redirect URI registered in your Shopify App Setup
-    const redirectUri = `https://shadcn-admin-dashboard-free-pi.vercel.app/api/callback`;
+    const redirectUri = "https://shadcn-admin-dashboard-free-pi.vercel.app/api/callback";
 
-    // Discovery must hit the account subdomain to retrieve valid keys
+    // Grab the configuration straight from your dedicated accounts subdomain
     const discoveryRes = await fetch(`https://account.${shop}/.well-known/openid-configuration`);
     const config = await discoveryRes.json();
 
@@ -30,9 +27,9 @@ export async function GET(req: NextRequest) {
 
     const tokenRes = await fetch(config.token_endpoint, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded', 
-        'Authorization': `Basic ${credentials}` 
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${credentials}`
       },
       body
     });
@@ -40,7 +37,6 @@ export async function GET(req: NextRequest) {
     const tokenData = await tokenRes.json();
     if (tokenData.error) throw new Error(tokenData.error_description);
 
-    // Decode ID Token
     const idTokenParts = tokenData.id_token.split('.');
     const payload = JSON.parse(Buffer.from(idTokenParts[1], 'base64').toString());
     
@@ -49,20 +45,21 @@ export async function GET(req: NextRequest) {
     
     const sessionData = `${payload.email}|${tokenData.access_token}|${expiryTime}`;
     const sig = crypto.createHmac('sha256', portalSecret).update(sessionData).digest('hex');
+    const cookieValue = `${sessionData}|${sig}`;
 
-    // Create response and set cookie for your Vercel domain
-    const response = NextResponse.redirect(new URL('/dashboard', req.url));
-    response.cookies.set('portal_session', `${sessionData}|${sig}`, {
+    // Redirect the customer straight into your working portal route
+    const response = NextResponse.redirect(new URL('/dashboard/returns', req.url));
+    response.cookies.set('portal_session', cookieValue, {
       httpOnly: true, 
       secure: true, 
       path: '/', 
       maxAge: 7200, 
-      sameSite: 'lax',
-      domain: 'shadcn-admin-dashboard-free-pi.vercel.app' // Bind to your app domain
+      sameSite: 'lax'
     });
 
     return response;
   } catch (error: any) {
+    console.error("Authorisation Error:", error.message);
     return new NextResponse(`OAuth Callback Failed: ${error.message}`, { status: 500 });
   }
 }
