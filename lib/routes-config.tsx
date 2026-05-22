@@ -1,9 +1,11 @@
-type PageRoutesType = {
+// lib/routes-config.tsx
+
+export type PageRoutesType = {
   title: string;
   items: PageRoutesItemType;
 };
 
-type PageRoutesItemType = {
+export type PageRoutesItemType = {
   title: string;
   href: string;
   icon?: string;
@@ -20,7 +22,16 @@ export const page_routes: PageRoutesType[] = [
         href: "/dashboard/default",
         icon: "PieChart"
       },
-      { title: "Users", href: "/dashboard/pages/users", icon: "Users" },
+      {
+        title: "Returns & Claims",
+        href: "/dashboard/returns",
+        icon: "RefreshCw"
+      },
+      { 
+        title: "Users", 
+        href: "/dashboard/pages/users", 
+        icon: "Users" 
+      },
       {
         title: "Settings",
         href: "/dashboard/pages/settings",
