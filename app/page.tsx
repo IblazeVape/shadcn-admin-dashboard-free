@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// --- Icons ---
 const IconBase = ({ children, className = "", ...props }: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className} width="1em" height="1em" {...props}>
     {children}
   </svg>
 );
 
-export const CheckCircle2 = (props: any) => (
+const CheckCircle2 = (props: any) => (
   <IconBase {...props}>
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
     <polyline points="22 4 12 14.01 9 11.01" />
@@ -37,7 +36,7 @@ export default function ReturnsPortalPage() {
       try {
         setIsLoading(true);
         const res = await fetch("/api/get-orders");
-        if (!res.ok) throw new Error("Could not fetch order history data.");
+        if (!res.ok) throw new Error("Could not fetch order history.");
         const data = await res.json();
         const parsed = Array.isArray(data) ? data : data.orders || [];
         setOrders(parsed);
@@ -164,7 +163,9 @@ export default function ReturnsPortalPage() {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium">Order #{order.name?.replace("#", "")}</p>
-                    <p className="text-sm text-muted-foreground">{order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-GB") : ""}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-GB") : ""}
+                    </p>
                   </div>
                   <span className="text-sm text-muted-foreground">View →</span>
                 </CardContent>
@@ -183,19 +184,16 @@ export default function ReturnsPortalPage() {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity} · £{item.price}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Qty: {item.quantityAvailable} · £{parseFloat(item.price).toFixed(2)}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
-
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitLoading}
-            className="w-full"
-          >
+          <Button onClick={handleSubmit} disabled={isSubmitLoading} className="w-full">
             {isSubmitLoading ? "Submitting..." : "Submit Return Request"}
           </Button>
         </div>
