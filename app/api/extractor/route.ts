@@ -10,12 +10,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Using environment variables from Screenshot 2026-05-23 at 10.12.20.jpg
     const response = await fetch(`https://6jjpzt-jz.myshopify.com/admin/oauth/access_token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        client_id: "71a72a7f45d6def454e6df50efb08402",
-        client_secret: "PASTE_YOUR_ADMIN_APP_SECRET_HERE", 
+        client_id: process.env.SHOPIFY_CLIENT_ID,
+        client_secret: process.env.SHOPIFY_CLIENT_SECRET, 
         code: code,
       }),
     });
