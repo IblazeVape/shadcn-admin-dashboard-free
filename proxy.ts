@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. Let background API endpoints pass through unhindered
@@ -18,12 +18,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/api/login", request.url));
   }
 
-  // 4. Session is valid; let them view the root or any deep links directly
+  // 4. Session is valid; let them view the root domain directly
   return NextResponse.next();
 }
 
 export const config = {
-  // Broaden the matcher to cover all routes except static assets
+  // Broaden the matcher to cover all paths across the app directory
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
