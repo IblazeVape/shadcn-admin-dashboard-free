@@ -18,12 +18,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/api/login", request.url));
   }
 
-  // 4. Your existing logic: If logged in and hitting the root domain, send them to the dashboard
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // 5. Allow access to all other authenticated dashboard paths
+  // 4. Session is valid; let them view the root or any deep links directly
   return NextResponse.next();
 }
 
