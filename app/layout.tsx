@@ -1,6 +1,5 @@
-// app/layout.tsx
 import React from "react";
-import "./globals.css"; 
+import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -16,8 +15,8 @@ export default function RootLayout({
         <SidebarProvider
           style={
             {
-              "--sidebar-width": "calc(var(--spacing) * 72)",
-              "--header-height": "calc(var(--spacing) * 12)",
+              "--sidebar-width": "288px",
+              "--header-height": "48px",
             } as React.CSSProperties
           }
         >
