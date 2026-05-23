@@ -1,4 +1,3 @@
-// app/api/callback/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
@@ -7,54 +6,52 @@ export async function GET(req: NextRequest) {
     const code = req.nextUrl.searchParams.get("code");
     if (!code) return new NextResponse("Authorisation code missing.", { status: 400 });
 
-    const shop = "iblazevape.co.uk"; 
+    const shop = "iblazevape.co.uk";
     const clientId = process.env.CUSTOMER_API_CLIENT_ID;
     const clientSecret = process.env.CUSTOMER_API_CLIENT_SECRET;
     const redirectUri = "https://shadcn-admin-dashboard-free-pi.vercel.app/api/callback";
 
-    // Grab the configuration straight from your dedicated accounts subdomain
     const discoveryRes = await fetch(`https://account.${shop}/.well-known/openid-configuration`);
     const config = await discoveryRes.json();
 
     const body = new URLSearchParams({
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
       client_id: clientId!,
       redirect_uri: redirectUri,
-      code: code
+      code: code,
     });
 
-    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
     const tokenRes = await fetch(config.token_endpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${credentials}`,
       },
-      body
+      body,
     });
 
     const tokenData = await tokenRes.json();
     if (tokenData.error) throw new Error(tokenData.error_description);
 
-    const idTokenParts = tokenData.id_token.split('.');
-    const payload = JSON.parse(Buffer.from(idTokenParts[1], 'base64').toString());
-    
+    const idTokenParts = tokenData.id_token.split(".");
+    const payload = JSON.parse(Buffer.from(idTokenParts[1], "base64").toString());
+
     const portalSecret = process.env.PORTAL_SECRET!;
-    const expiryTime = Math.floor(Date.now() / 1000) + 7200; 
-    
+    const expiryTime = Math.floor(Date.now() / 1000) + 7200;
+
     const sessionData = `${payload.email}|${tokenData.access_token}|${expiryTime}`;
-    const sig = crypto.createHmac('sha256', portalSecret).update(sessionData).digest('hex');
+    const sig = crypto.createHmac("sha256", portalSecret).update(sessionData).digest("hex");
     const cookieValue = `${sessionData}|${sig}`;
 
-    // Redirect the customer straight into your working portal route
-    const response = NextResponse.redirect(new URL('/dashboard/returns', req.url));
-    response.cookies.set('portal_session', cookieValue, {
-      httpOnly: true, 
-      secure: true, 
-      path: '/', 
-      maxAge: 7200, 
-      sameSite: 'lax'
+    const response = NextResponse.redirect(new URL("/", req.url));
+    response.cookies.set("portal_session", cookieValue, {
+      httpOnly: true,
+      secure: true,
+      path: "/",
+      maxAge: 7200,
+      sameSite: "lax",
     });
 
     return response;
